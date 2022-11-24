@@ -1,3 +1,4 @@
+import NoteCard from './note-card'
 import NoteForm from './note-form'
 
-export { NoteForm }
+export { NoteForm, NoteCard }

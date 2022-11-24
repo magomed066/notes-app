@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { Container } from 'react-bootstrap'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import useLocalStorage from './hooks/useLocalstorage'
-import { NewNote } from './pages'
+import useLocalStorage from './hooks/useLocalStorage'
+import { NewNote, NoteDetails, Notes } from './pages'
 import { v4 as uuidV4 } from 'uuid'
 import { NoteModel, RawNote, Tag } from './types/notes'
 
@@ -35,7 +35,10 @@ const App = () => {
 	return (
 		<Container className="my-4 p-3 app">
 			<Routes>
-				<Route path="/" element={<h1>Home</h1>} />
+				<Route
+					path="/"
+					element={<Notes availableTags={tags} notes={notesWithTags} />}
+				/>
 				<Route
 					path="/new"
 					element={
@@ -47,7 +50,7 @@ const App = () => {
 					}
 				/>
 				<Route path="/:id">
-					<Route index element={<h1>Show</h1>} />
+					<Route index element={<h2>Show</h2>} />
 					<Route path="edit" element={<h1>Edit</h1>} />
 				</Route>
 				<Route path="*" element={<Navigate to="/" />} />

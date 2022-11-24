@@ -39,6 +39,10 @@ const NoteForm: FC<Props> = ({ onSubmit, availableTags, onAddTag }) => {
 		setSelectedTags(mappedTags)
 	}
 
+	const setTag = (tag: Tag) => {
+		setSelectedTags((prev) => [...prev, tag])
+	}
+
 	return (
 		<Form onSubmit={handleSubmit}>
 			<Stack gap={4}>
@@ -52,6 +56,7 @@ const NoteForm: FC<Props> = ({ onSubmit, availableTags, onAddTag }) => {
 					<Col>
 						<Form.Group controlId="tags">
 							<Form.Label>Tags</Form.Label>
+
 							<CreatableReactSelect
 								onCreateOption={(label) => {
 									const newTag = { id: uuidV4(), label }
