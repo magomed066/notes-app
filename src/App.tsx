@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Container } from 'react-bootstrap'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import useLocalStorage from './hooks/useLocalStorage'
-import { NewNote, NoteDetails, Notes } from './pages'
+import { EditNote, NewNote, Note, NoteLayout, Notes } from './pages'
 import { v4 as uuidV4 } from 'uuid'
 import { NoteModel, RawNote, Tag } from './types/notes'
 
@@ -32,12 +32,44 @@ const App = () => {
 		setTags((prev) => [...prev, tag])
 	}
 
+	const updateNote = (id: string, { tags, ...data }: NoteModel) => {
+		setNotes((prev) => {
+			return prev.map((note) =>
+				note.id === id
+					? {
+							...note,
+							...data,
+							tagIds: tags.map((tag) => tag.id),
+					  }
+					: note,
+			)
+		})
+	}
+
+	const deleteNote = (id: string) => {
+		setNotes((prev) => prev.filter((note) => note.id !== id))
+	}
+
+	const updateTag = (id: string, label: string) => {
+		setTags((prev) => prev.map((tag) => (tag.id ? { ...tag, label } : tag)))
+	}
+	const deleteTag = (id: string) => {
+		setTags((prev) => prev.filter((tag) => tag.id !== id))
+	}
+
 	return (
 		<Container className="my-4 p-3 app">
 			<Routes>
 				<Route
 					path="/"
-					element={<Notes availableTags={tags} notes={notesWithTags} />}
+					element={
+						<Notes
+							updateTag={updateTag}
+							deleteTag={deleteTag}
+							availableTags={tags}
+							notes={notesWithTags}
+						/>
+					}
 				/>
 				<Route
 					path="/new"
@@ -49,9 +81,18 @@ const App = () => {
 						/>
 					}
 				/>
-				<Route path="/:id">
-					<Route index element={<h2>Show</h2>} />
-					<Route path="edit" element={<h1>Edit</h1>} />
+				<Route path="/:id" element={<NoteLayout notes={notesWithTags} />}>
+					<Route index element={<Note deleteNote={deleteNote} />} />
+					<Route
+						path="edit"
+						element={
+							<EditNote
+								onAddTag={addTag}
+								onSubmit={updateNote}
+								availableTags={tags}
+							/>
+						}
+					/>
 				</Route>
 				<Route path="*" element={<Navigate to="/" />} />
 			</Routes>

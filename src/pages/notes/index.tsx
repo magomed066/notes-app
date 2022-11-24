@@ -2,18 +2,21 @@ import React, { FC, useMemo, useState } from 'react'
 import { Button, Col, Form, Row, Stack } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ReactSelect, { MultiValue } from 'react-select'
-import { NoteCard } from '../../components'
+import { EditTagsModal, NoteCard } from '../../components'
 import { Note, Tag } from '../../types/notes'
 import transformSelectData from '../../utils/transformSelectData'
 
 type Props = {
 	availableTags: Tag[]
 	notes: Note[]
+	deleteTag: (id: string) => void
+	updateTag: (id: string, label: string) => void
 }
 
-const Notes: FC<Props> = ({ availableTags, notes }) => {
+const Notes: FC<Props> = ({ availableTags, notes, deleteTag, updateTag }) => {
 	const [selectedTags, setSelectedTags] = useState<Tag[]>([])
 	const [title, setTitle] = useState<string>('')
+	const [editTagsModalIsOpen, setEditTagsModalIsOpen] = useState(false)
 
 	const handleChange = (
 		tags: MultiValue<ReturnType<typeof transformSelectData>[0]>,
@@ -36,6 +39,8 @@ const Notes: FC<Props> = ({ availableTags, notes }) => {
 		})
 	}, [title, selectedTags, notes])
 
+	const hideModal = () => setEditTagsModalIsOpen(false)
+
 	return (
 		<>
 			<Row className="align-items-center mb-4">
@@ -44,8 +49,13 @@ const Notes: FC<Props> = ({ availableTags, notes }) => {
 				</Col>
 				<Col xs="auto">
 					<Stack direction="horizontal" gap={2}>
+						<Button
+							onClick={() => setEditTagsModalIsOpen(true)}
+							variant="outline-secondary"
+						>
+							Edit Tags
+						</Button>
 						<Link to="/new">
-							<Button variant="outlined">Edit Tags</Button>
 							<Button variant="primary">Create</Button>
 						</Link>
 					</Stack>
@@ -53,8 +63,8 @@ const Notes: FC<Props> = ({ availableTags, notes }) => {
 			</Row>
 
 			<Form>
-				<Row className="mb-4">
-					<Col>
+				<Row className="mb-4 flex-wrap">
+					<Col xs={12} md={6} className="mb-2 mb-xs-0 mb-sm-0">
 						<Form.Group controlId="title">
 							<Form.Label>Title</Form.Label>
 							<Form.Control
@@ -64,7 +74,7 @@ const Notes: FC<Props> = ({ availableTags, notes }) => {
 							/>
 						</Form.Group>
 					</Col>
-					<Col>
+					<Col xs={12} md={6}>
 						<Form.Group controlId="Tags">
 							<Form.Label>Tags</Form.Label>
 							<ReactSelect
@@ -85,6 +95,14 @@ const Notes: FC<Props> = ({ availableTags, notes }) => {
 					</Col>
 				))}
 			</Row>
+
+			<EditTagsModal
+				updateTag={updateTag}
+				deleteTag={deleteTag}
+				show={editTagsModalIsOpen}
+				handleClose={hideModal}
+				availableTags={availableTags}
+			/>
 		</>
 	)
 }
